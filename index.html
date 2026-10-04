@@ -3,233 +3,22 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="AccessKit is an accessibility testing workspace for keyboard access, accessible names and contrast.">
-  <title>AccessKit — Accessibility QA workspace</title>
+  <meta name="description" content="Scan public pages or HTML for keyboard, labeling and contrast issues, and get a prioritized accessibility report.">
+  <meta name="theme-color" content="#0e3b2c">
+  <title>AccessKit — Web accessibility scanner</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%230e3b2c'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='21' font-weight='600' text-anchor='middle' fill='%23d6f25f'%3Ea%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root{
-      --bg:#f6f3ec; --panel:#ffffff; --ink:#14211b; --muted:#4b5850; --soft:#eef0e8;
-      --forest:#0e3b2c; --forest-2:#165540; --green:#0f6b4d; --green-ink:#0b5a40; --mint:#e1f1e7;
-      --lime:#d6f25f; --amber:#fff0cc; --amber-ink:#704300;
-      --line:#d5d9cf; --control:#66746b; --crit:#a33b33; --high:#a85b00; --low:#43627f;
-      --radius:16px; --shadow:0 1px 2px #14211b0f,0 10px 30px #14211b0f;
-      --display:"Fraunces",Georgia,"Times New Roman",serif;
-      --sans:"Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-    }
-    *{box-sizing:border-box}
-    [hidden]{display:none!important}
-    html{scroll-behavior:smooth}
-    body{margin:0;background:var(--bg);color:var(--ink);font:400 1rem/1.55 var(--sans);-webkit-font-smoothing:antialiased}
-    button,input,select,textarea{font:inherit;color:inherit}
-    button{cursor:pointer}
-    h1,h2,h3{margin:0;line-height:1.15}
-    :focus-visible{outline:3px solid var(--green);outline-offset:2px;border-radius:6px}
-    .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-    .skip{position:absolute;left:12px;top:-60px;background:var(--forest);color:#fff;padding:10px 16px;border-radius:10px;z-index:100;font-weight:600;text-decoration:none}
-    .skip:focus{top:12px}
-
-    /* Header */
-    .site-header{position:sticky;top:0;z-index:20;background:#f6f3ecf2;backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-    .bar{max-width:1200px;margin:auto;padding:12px 28px;display:flex;align-items:center;gap:24px}
-    .brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:600;font-size:1.35rem;letter-spacing:-.02em;color:var(--forest)}
-    .logo{width:34px;height:34px;border-radius:11px;background:var(--forest);color:var(--lime);display:grid;place-items:center;font-family:var(--display);font-size:1.2rem}
-    .nav{display:flex;gap:4px;margin-left:8px;flex:1;overflow-x:auto}
-    .nav button{border:0;background:transparent;color:var(--muted);padding:9px 14px;border-radius:999px;font-weight:600;font-size:.9rem;white-space:nowrap}
-    .nav button:hover{background:var(--soft);color:var(--ink)}
-    .nav button.active{background:var(--forest);color:#fff}
-    .account-actions{display:flex;align-items:center;gap:8px}
-    .context{max-width:1200px;margin:auto;padding:0 28px 10px;display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:.85rem;color:var(--muted)}
-    .context b{color:var(--ink)}
-    .context-tools{display:flex;gap:8px;align-items:center}
-    select{border:1px solid var(--control);border-radius:10px;padding:7px 10px;background:#fff}
-
-    /* Buttons */
-    .button{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--control);background:#fff;border-radius:11px;padding:10px 16px;font-weight:600;font-size:.9rem;transition:background .15s,transform .15s}
-    .button:hover{background:var(--soft)}
-    .button:active{transform:translateY(1px)}
-    .button.primary{background:var(--green);border-color:var(--green);color:#fff}
-    .button.primary:hover{background:var(--green-ink)}
-    .button[disabled]{opacity:.6;cursor:not-allowed}
-    .account-actions .button{padding:8px 14px}
-
-    .shell{max-width:1200px;margin:auto;padding:28px 28px 70px}
-    .eyebrow{font-size:.78rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--green-ink)}
-
-    /* Hero */
-    .hero{display:grid;grid-template-columns:1.05fr .95fr;gap:40px;align-items:center;background:var(--forest);color:#fff;border-radius:28px;padding:56px 52px;position:relative;overflow:hidden}
-    .hero::before{content:"";position:absolute;right:-120px;top:-140px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,#2a7a5c66,transparent 68%)}
-    .hero>*{position:relative}
-    .hero .eyebrow{color:var(--lime)}
-    .hero h1{font-family:var(--display);font-weight:600;font-size:clamp(2.2rem,4.6vw,3.6rem);letter-spacing:-.03em;margin:14px 0 18px}
-    .hero-lede{color:#d8e8de;font-size:1.05rem;max-width:34ch;margin:0 0 26px}
-    .checks{list-style:none;margin:0;padding:0;display:grid;gap:10px;color:#e8f2ec;font-size:.95rem}
-    .checks li{display:flex;gap:10px;align-items:center}
-    .checks li::before{content:"✓";display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--lime);color:var(--forest);font-weight:800;font-size:.8rem;flex:none}
-    .scanner-card{background:var(--panel);color:var(--ink);border-radius:20px;padding:24px;box-shadow:0 24px 60px #05181066}
-    .scanner-card .tabs{margin-bottom:16px}
-    .scanner-card label.field-label{display:block;font-weight:600;font-size:.9rem;margin-bottom:8px}
-    .url-row{display:flex;gap:8px}
-    .url-row input{min-width:0;flex:1;border:1px solid var(--control);border-radius:11px;padding:13px 14px;font-size:1rem;background:#fff}
-    .url-row input:focus{outline:3px solid #0f6b4d44;border-color:var(--green)}
-    .url-status{font-size:.88rem;color:var(--muted);min-height:20px;margin:10px 0 0}
-    .url-status.error{color:#8f2924}
-    .url-status.success{color:var(--green-ink)}
-    .hero-note{font-size:.85rem;color:var(--muted);margin:10px 0 0}
-    .editor{width:100%;height:220px;resize:vertical;border:1px solid var(--control);border-radius:11px;padding:13px;background:#fbfcfa;font:.85rem/1.6 ui-monospace,SFMono-Regular,Consolas,monospace}
-    .editor:focus{outline:3px solid #0f6b4d44;border-color:var(--green)}
-    .actions{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap}
-    .actions .group{display:flex;gap:8px;flex-wrap:wrap}
-    .file-label{font-size:.88rem;color:var(--green-ink);font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
-    .file-label input{position:absolute;opacity:0;width:1px;height:1px}
-    .file-label:focus-within{outline:3px solid var(--green);outline-offset:3px;border-radius:4px}
-
-    /* Tabs */
-    .tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto}
-    .tab{position:relative;border:0;background:transparent;color:var(--muted);padding:11px 12px 12px;font-size:.9rem;font-weight:600;white-space:nowrap}
-    .tab:hover{color:var(--ink)}
-    .tab[aria-selected="true"]{color:var(--green-ink)}
-    .tab[aria-selected="true"]::after{content:"";height:3px;background:var(--green);position:absolute;bottom:-1px;left:8px;right:8px;border-radius:3px}
-    .tab-count{display:inline-grid;place-items:center;min-width:22px;height:22px;border-radius:11px;background:var(--soft);margin-left:6px;padding:0 6px;font-size:.78rem}
-
-    /* Sections */
-    .section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin:56px 0 20px}
-    .section-head h2{font-family:var(--display);font-weight:600;font-size:clamp(1.6rem,3vw,2.1rem);letter-spacing:-.02em;margin-top:6px}
-    .section-head p{margin:6px 0 0;color:var(--muted);max-width:56ch}
-    .card,.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
-    .panel{padding:24px}
-    .panel h2{font-size:1.1rem;margin-bottom:6px}
-    .panel p{color:var(--muted);margin:0}
-
-    .health-overview{display:grid;grid-template-columns:minmax(260px,.8fr) minmax(340px,1.2fr);gap:18px}
-    .health-card,.chart-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow)}
-    .health-card{background:var(--mint);border-color:#bcdcca}
-    .health-card h2,.chart-card h2{font-size:1rem;margin-bottom:6px}
-    .health-card p,.chart-card p{font-size:.88rem;color:var(--muted);margin:0}
-    .score-value{font-family:var(--display);font-size:4.4rem;line-height:1;font-weight:600;letter-spacing:-.04em;margin:22px 0 8px;color:var(--forest)}
-    .score-value small{font-family:var(--sans);font-size:1.1rem;color:var(--muted);font-weight:500;letter-spacing:0}
-    .score-label{font-weight:700;color:var(--green-ink);margin-bottom:14px}
-    .score-method{border-top:1px solid #b9d4c4;padding-top:12px;margin-top:14px!important;font-size:.82rem!important}
-    .chart-layout{display:flex;align-items:center;gap:28px;margin-top:16px}
-    .pie-chart{width:160px;height:160px;flex:0 0 160px}
-    .pie-legend{list-style:none;margin:0;padding:0;display:grid;gap:12px;min-width:0;flex:1}
-    .pie-legend li{display:grid;grid-template-columns:14px 1fr auto;gap:10px;align-items:center;font-size:.95rem}
-    .legend-swatch{width:14px;height:14px;border-radius:4px}
-    .legend-critical{background:var(--crit)}.legend-high{background:var(--high)}.legend-low{background:var(--low)}
-    .legend-count{font-weight:700;font-variant-numeric:tabular-nums}
-    .chart-summary{margin-top:16px!important}
-
-    .layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start;margin-top:18px}
-    .panel-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px}
-    .health-disclaimer{background:var(--soft);border-radius:10px;padding:10px 12px;font-size:.85rem!important;margin:0 0 14px!important}
-    .result-list{display:grid;gap:10px;max-height:560px;overflow:auto;padding:2px}
-    .result{border:1px solid var(--line);border-left:4px solid var(--control);border-radius:12px;padding:14px 16px;background:#fff}
-    .result-top{display:flex;justify-content:space-between;gap:10px;align-items:center}
-    .result-title{font-weight:650}
-    .result p{font-size:.9rem;margin:8px 0!important}
-    .result code{font-size:.8rem;color:#2f4a3d;background:var(--soft);padding:3px 7px;border-radius:6px;overflow-wrap:anywhere}
-    .badge{border-radius:999px;padding:4px 10px;font-size:.75rem;font-weight:700;white-space:nowrap}
-    .badge.review{background:#e6ecf4;color:#34495f}
-    .badge.critical{background:#fde8e5;color:#8f2924}
-    .badge.high{background:var(--amber);color:var(--amber-ink)}
-    .badge.low,.badge.medium{background:#e6ecf4;color:#34495f}
-    .empty{text-align:center;color:var(--muted);padding:44px 16px}
-    .empty strong{display:block;color:var(--ink);font-family:var(--display);font-size:1.25rem;margin-bottom:6px}
-    .foot{font-size:.82rem;color:var(--muted);margin-top:14px}
-    .aside-stack{display:grid;gap:18px}
-    .tip{background:var(--forest);color:#e4efe8;border-radius:var(--radius);padding:22px}
-    .tip strong{display:block;color:#fff;font-family:var(--display);font-size:1.15rem;margin-bottom:6px}
-    .tip p{color:#cfe1d6;margin:0;font-size:.92rem}
-
-    /* Free preview */
-    .free-note{margin:0 0 14px;background:var(--mint);color:var(--green-ink);padding:9px 13px;border-radius:10px;font-weight:600;font-size:.88rem}
-    .free-note:empty{display:none}
-    .preview-banner{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;background:var(--amber);border:1px solid #e6cf92;color:var(--amber-ink);border-radius:12px;padding:12px 16px;margin:0 0 14px;font-size:.92rem}
-    .preview-banner strong{color:#4d2f00}
-    .locked{border:1px dashed var(--control);border-radius:12px;background:var(--soft);padding:24px;text-align:center}
-    .locked h3{font-family:var(--display);font-size:1.25rem;margin-bottom:6px}
-    .locked p{margin:0 auto 16px;color:var(--muted);font-size:.92rem;max-width:44ch}
-    .locked-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
-    .ghost{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:#fff;filter:blur(4px);user-select:none;pointer-events:none}
-    .ghost i{display:block;height:10px;border-radius:5px;background:#cfd6cc;margin:8px 0}
-    .ghost i:first-child{width:55%;height:12px}.ghost i:nth-child(3){width:80%}
-
-    /* Pricing */
-    .plans{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-    .plan{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow);display:flex;flex-direction:column}
-    .plan.featured{background:var(--forest);color:#fff;border-color:var(--forest);transform:translateY(-8px)}
-    .plan h3{font-size:1rem;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    .plan-price{font-family:var(--display);font-weight:600;font-size:2.6rem;letter-spacing:-.03em;margin:14px 0 2px}
-    .plan-price small{font-family:var(--sans);font-size:.9rem;color:var(--muted);font-weight:500;letter-spacing:0}
-    .plan.featured .plan-price small,.plan.featured .plan-cycle{color:#cfe1d6}
-    .plan-cycle{font-size:.9rem;color:var(--muted)}
-    .plan .button{width:100%;margin-top:auto}
-    .plan-body{margin-bottom:22px}
-    .plan.featured .button.primary{background:var(--lime);border-color:var(--lime);color:var(--forest)}
-    .plan.featured .button.primary:hover{background:#c5e44c}
-    .plan.featured :focus-visible{outline-color:var(--lime)}
-    .plan.featured .badge.review{background:var(--lime);color:var(--forest)}
-    .plan-note{font-size:.85rem;color:var(--muted);margin:18px 0 0}
-    .plan-state{font-size:.92rem;color:var(--green-ink);font-weight:600;min-height:22px;margin-bottom:6px}
-
-    /* Other views */
-    .heading{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;margin:36px 0 22px}
-    .heading h1{font-family:var(--display);font-weight:600;font-size:2.2rem;letter-spacing:-.02em;margin:6px 0}
-    .heading p{margin:0;color:var(--muted)}
-    #workspaceList{padding-left:20px;color:var(--muted)}
-    #workspaceForm{margin-bottom:22px}
-    #workspaceForm .url-row{margin-top:8px}
-
-    footer.site-footer{max-width:1200px;margin:0 auto;padding:26px 28px 40px;border-top:1px solid var(--line);color:var(--muted);font-size:.88rem;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
-
-    /* Toast + dialog */
-    .toast{position:fixed;bottom:22px;right:22px;max-width:min(420px,calc(100% - 44px));background:var(--forest);color:#fff;padding:13px 18px;border-radius:12px;font-size:.92rem;box-shadow:0 16px 40px #0e3b2c55;opacity:0;transform:translateY(8px);transition:.2s;pointer-events:none;z-index:50}
-    .toast.show{opacity:1;transform:none}
-    .dialog{border:0;border-radius:20px;padding:0;width:min(460px,calc(100% - 30px));box-shadow:0 30px 80px #0a201666;color:var(--ink)}
-    .dialog::backdrop{background:#0a201699}
-    .dialog-inner{padding:30px}
-    .dialog h2{font-family:var(--display);font-weight:600;font-size:1.6rem;margin:0 0 8px}
-    .dialog p{color:var(--muted);font-size:.92rem}
-    .dialog label{display:block;font-weight:600;font-size:.9rem;margin:14px 0 6px}
-    .dialog input{width:100%;padding:11px 12px;border:1px solid var(--control);border-radius:10px;font-size:1rem}
-    .dialog input:focus{outline:3px solid #0f6b4d44;border-color:var(--green)}
-    .dialog-actions{display:flex;gap:8px;margin-top:14px}
-    .dialog-actions button{flex:1}
-    .dialog-switch{border:0;background:none;color:var(--green-ink);font-weight:700;padding:12px 0 0;text-decoration:underline;text-underline-offset:3px}
-    .dialog-error{min-height:20px;color:#8f2924!important;margin:10px 0 0}
-    .dialog-close{float:right;border:0;background:var(--soft);border-radius:50%;width:34px;height:34px;font-size:1.2rem}
-
-    @media(max-width:960px){
-      .hero{grid-template-columns:1fr;padding:40px 28px}
-      .layout{grid-template-columns:1fr}
-      .health-overview{grid-template-columns:1fr}
-      .plans{grid-template-columns:1fr}
-      .plan.featured{transform:none}
-    }
-    @media(max-width:700px){
-      .bar{flex-wrap:wrap;padding:12px 16px;gap:10px}
-      .nav{order:3;flex-basis:100%;margin-left:0}
-      .account-actions{margin-left:auto}
-      .context{padding:0 16px 10px}
-      .shell{padding:18px 16px 50px}
-      .hero{border-radius:20px;padding:30px 20px}
-      .scanner-card{padding:18px}
-      .url-row{flex-direction:column}
-      .chart-layout{flex-direction:column;align-items:flex-start;gap:18px}
-      .section-head,.heading{flex-direction:column;align-items:flex-start}
-      .panel,.health-card,.chart-card{padding:20px}
-      footer.site-footer{padding:22px 16px 34px}
-    }
-    @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
-  </style>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <a class="skip" href="#main">Skip to main content</a>
+
   <header class="site-header">
     <div class="bar">
       <div class="brand"><span class="logo" aria-hidden="true">a</span> AccessKit</div>
-      <nav class="nav" aria-label="Main navigation">
+      <nav class="nav" aria-label="Main">
         <button class="active" data-view="overview" aria-current="page">Overview</button>
         <button data-view="scans">Scans</button>
         <button data-view="issues">Issues</button>
@@ -244,79 +33,89 @@
       <div>Workspace <span aria-hidden="true">/</span> <b id="workspaceCrumb">Overview</b></div>
       <div class="context-tools">
         <label class="sr-only" for="workspaceSelect">Active workspace</label>
-        <select id="workspaceSelect" aria-label="Active workspace" hidden></select>
+        <select id="workspaceSelect" hidden></select>
         <button class="button" id="newWorkspaceBtn" hidden>+ Workspace</button>
       </div>
     </div>
   </header>
 
-  <main id="main" tabindex="-1" class="shell">
+  <main id="main" class="shell" tabindex="-1">
+    <noscript><p class="panel">AccessKit needs JavaScript to run scans.</p></noscript>
+
+    <!-- Scanner -->
     <section class="hero" id="scannerHero" aria-labelledby="heroHeading">
       <div>
         <div class="eyebrow">Web accessibility scanner</div>
-        <h1 id="heroHeading">Make your website work for everyone.</h1>
-        <p class="hero-lede">Scan a public page or paste markup and get a prioritized list of barriers to fix before release.</p>
+        <h1 id="heroHeading">Find accessibility barriers before your users do.</h1>
+        <p class="hero-lede">Scan a public page or paste HTML. Get a prioritized list of issues to fix before release.</p>
         <ul class="checks">
-          <li>Rendered styles checked in a real browser</li>
-          <li>Keyboard access, accessible names and contrast</li>
-          <li>Exportable reports for your team</li>
+          <li>Pages scanned in a real browser</li>
+          <li>Keyboard, labels and contrast checks</li>
+          <li>Reports you can export and share</li>
         </ul>
       </div>
+
       <div class="scanner-card">
-        <div class="tabs scan-tabs" role="tablist" aria-label="Choose scan input">
-          <button class="tab" id="scanTabUrl" role="tab" aria-selected="true" aria-controls="scanPanelUrl" tabindex="0">Scan using URL</button>
-          <button class="tab" id="scanTabHtml" role="tab" aria-selected="false" aria-controls="scanPanelHtml" tabindex="-1">Pasted HTML snippet</button>
+        <p class="free-note" id="freeNote" aria-live="polite"></p>
+
+        <div class="tabs scan-tabs" role="tablist" aria-label="Scan input">
+          <button class="tab" id="scanTabUrl" role="tab" aria-selected="true" aria-controls="scanPanelUrl">Scan a URL</button>
+          <button class="tab" id="scanTabHtml" role="tab" aria-selected="false" aria-controls="scanPanelHtml" tabindex="-1">Paste HTML</button>
         </div>
+
         <div id="scanPanelUrl" role="tabpanel" aria-labelledby="scanTabUrl">
           <form id="urlScanForm">
-            <label class="field-label" for="urlInput">Enter a public page URL</label>
+            <label class="field-label" for="urlInput">Public page URL</label>
             <div class="url-row">
               <input id="urlInput" type="url" inputmode="url" placeholder="https://example.com" required>
               <button class="button primary" id="urlScanBtn" type="submit">Scan page <span aria-hidden="true">→</span></button>
             </div>
-            <p class="url-status" id="urlStatus" role="status" aria-live="polite"></p>
+            <p class="url-status" id="urlStatus" role="status"></p>
           </form>
-          <p class="hero-note">Rendered styles · No extension needed · Public pages only</p>
+          <p class="hero-note">Public pages only. No extension needed.</p>
         </div>
+
         <div id="scanPanelHtml" role="tabpanel" aria-labelledby="scanTabHtml" hidden>
-          <label class="field-label" for="htmlInput">Paste HTML markup</label>
-          <textarea id="htmlInput" class="editor" spellcheck="false" placeholder="Paste a component or page snippet here…"></textarea>
+          <label class="field-label" for="htmlInput">HTML markup</label>
+          <textarea id="htmlInput" class="editor" spellcheck="false" placeholder="Paste a page or component…"></textarea>
           <div class="actions">
             <div class="group">
-              <button class="button primary" id="scanBtn" type="button">Run accessibility checks</button>
+              <button class="button primary" id="scanBtn" type="button">Run checks</button>
               <button class="button" id="sampleBtn" type="button">Load sample</button>
             </div>
             <label class="file-label">Open .html file <input type="file" id="fileInput" accept="text/html,.html,.htm"></label>
           </div>
-          <p class="hero-note">Markup-only checks cannot evaluate external stylesheets or rendered contrast.</p>
+          <p class="hero-note">Pasted markup is checked without external stylesheets, so contrast results are limited.</p>
         </div>
       </div>
     </section>
 
+    <!-- Overview -->
     <section id="overviewView" aria-label="Overview">
       <div class="section-head">
         <div>
-          <div class="eyebrow">Your scan workspace</div>
-          <h2>Page accessibility health</h2>
-          <p>See the severity mix at a glance and focus your review work where it matters.</p>
+          <div class="eyebrow">Results</div>
+          <h2>Accessibility health</h2>
+          <p>Severity mix and the issues to fix first.</p>
         </div>
         <button class="button" id="exportBtn">↓ Export report</button>
       </div>
 
-      <section class="health-overview" aria-label="Accessibility score and severity summary">
+      <div class="health-overview">
         <article class="health-card">
-          <h2>Accessibility health score</h2>
-          <p id="scoreContext">Run a page scan to calculate a score.</p>
+          <h3>Health score</h3>
+          <p id="scoreContext">Run a scan to see your score.</p>
           <div class="score-value" id="healthScore">—<small>/100</small></div>
           <div class="score-label" id="scoreLabel">Waiting for scan</div>
-          <p class="score-method">Heuristic score: starts at 100, subtracts 12 per critical, 6 per high, and 2 per low automated finding. Manual checks are not included.</p>
+          <p class="score-method">Starts at 100 and subtracts 12 per critical, 6 per high and 2 per low finding. Manual checks are excluded.</p>
         </article>
+
         <article class="chart-card">
-          <h2>Automated findings by severity</h2>
-          <p>Severity distribution for this scan</p>
+          <h3>Findings by severity</h3>
+          <p>Automated findings from the latest scan</p>
           <div class="chart-layout">
-            <svg class="pie-chart" id="severityChart" viewBox="0 0 120 120" role="img" aria-labelledby="chartTitle chartDescription">
-              <title id="chartTitle">Automated findings by severity</title>
+            <svg class="pie-chart" viewBox="0 0 120 120" role="img" aria-labelledby="chartTitle chartDescription">
+              <title id="chartTitle">Findings by severity</title>
               <desc id="chartDescription">No scan has been run.</desc>
               <circle id="emptyPie" cx="60" cy="60" r="50" fill="#e5ebe6"></circle>
               <g id="pieSlices" aria-hidden="true"></g>
@@ -327,81 +126,155 @@
               <li><span class="legend-swatch legend-low" aria-hidden="true"></span><span>Low</span><span class="legend-count" id="lowCount">0</span></li>
             </ul>
           </div>
-          <p class="chart-summary" id="chartSummary" aria-live="polite">Run a scan to see the severity distribution.</p>
+          <p class="chart-summary" id="chartSummary" aria-live="polite">Run a scan to see the breakdown.</p>
         </article>
-      </section>
+      </div>
 
       <div class="layout">
         <section class="panel" aria-labelledby="findingsHeading">
           <div class="panel-head">
-            <div><h2 id="findingsHeading">Scan results</h2><p id="resultSummary">Run a check to see results.</p></div>
-            <span id="resultCount" class="badge review">0 findings</span>
+            <div>
+              <h2 id="findingsHeading">Findings</h2>
+              <p id="resultSummary">Run a scan to see results.</p>
+            </div>
+            <span class="badge review" id="resultCount">0 findings</span>
           </div>
-          <div class="preview-banner" id="previewBanner" role="region" aria-label="Free preview" hidden><span id="previewBannerText"></span><button class="button primary" type="button" data-open-auth="register">Unlock full report</button></div>
-          <p class="health-disclaimer">“Confirmed” means an automated rule matched the scanned page. Review each result in context; automated checks do not establish WCAG conformance.</p>
-          <div class="tabs results-tabs" role="tablist" aria-label="Scan result types">
-            <button class="tab" id="tab-violations" role="tab" aria-selected="true" aria-controls="resultsPanel" tabindex="0" data-tab="violations">Confirmed violations <span class="tab-count" id="confirmedTabCount">0</span></button>
+
+          <div class="preview-banner" id="previewBanner" hidden>
+            <span id="previewBannerText"></span>
+            <button class="button primary" type="button" data-open-auth="register">Unlock full report</button>
+          </div>
+
+          <div class="tabs results-tabs" role="tablist" aria-label="Result types">
+            <button class="tab" id="tab-violations" role="tab" aria-selected="true" aria-controls="resultsPanel" data-tab="violations">Violations <span class="tab-count" id="confirmedTabCount">0</span></button>
             <button class="tab" id="tab-review" role="tab" aria-selected="false" aria-controls="resultsPanel" tabindex="-1" data-tab="review">Needs review <span class="tab-count" id="reviewTabCount">0</span></button>
-            <button class="tab" id="tab-manual" role="tab" aria-selected="false" aria-controls="resultsPanel" tabindex="-1" data-tab="manual">Manual check <span class="tab-count" id="manualTabCount">0</span></button>
+            <button class="tab" id="tab-manual" role="tab" aria-selected="false" aria-controls="resultsPanel" tabindex="-1" data-tab="manual">Manual checks <span class="tab-count" id="manualTabCount">0</span></button>
           </div>
-          <div id="resultsPanel" role="tabpanel" aria-labelledby="tab-violations" tabindex="0" style="margin-top:14px">
-            <div id="resultList" class="result-list" aria-live="polite"><div class="empty"><strong>Ready when you are</strong>Run a scan to see confirmed violations, review items, and manual checks.</div></div>
+
+          <div id="resultsPanel" role="tabpanel" aria-labelledby="tab-violations" tabindex="0">
+            <div class="result-list" id="resultList" aria-live="polite"></div>
           </div>
-          <div class="foot">Automated checks cannot confirm a complete accessible experience. Verify focus order, control behavior, and screen reader output with people and assistive technology.</div>
         </section>
 
-        <aside class="aside-stack" aria-label="Audit notes">
-          <div class="panel">
-            <h2>Audit notes</h2>
-            <p>Checks are heuristic and may miss issues or report items that are acceptable in context. This is not a conformance certification.</p>
-            <p style="margin:12px 0 16px">Findings and saved scan history are scoped to your selected workspace.</p>
-            <button class="button" type="button" data-go-view="scans">View scan history</button>
-          </div>
-          <div class="tip">
-            <strong>Build access into every release</strong>
-            <p>This tool helps your team spot common barriers. Keep human testing in your workflow too.</p>
-          </div>
+        <aside class="panel" aria-labelledby="notesHeading">
+          <h2 id="notesHeading">About these results</h2>
+          <p>Automated checks flag likely issues but cannot confirm WCAG conformance. Review each result in context and test with assistive technology.</p>
+          <button class="button" type="button" data-go-view="scans">View scan history</button>
         </aside>
       </div>
+
+      <section class="features" aria-labelledby="featuresHeading">
+        <div class="section-head">
+          <div>
+            <div class="eyebrow">Coverage</div>
+            <h2 id="featuresHeading">What AccessKit checks</h2>
+          </div>
+        </div>
+        <div class="feature-grid">
+          <article class="feature">
+            <h3>Keyboard access</h3>
+            <p>Custom controls that can’t be reached or operated without a mouse, and tab order that breaks the page flow.</p>
+          </article>
+          <article class="feature">
+            <h3>Names and roles</h3>
+            <p>Buttons, inputs and widgets with no accessible name, or custom controls missing their state.</p>
+          </article>
+          <article class="feature">
+            <h3>Color contrast</h3>
+            <p>Text and control boundaries that fall below WCAG AA contrast ratios.</p>
+          </article>
+        </div>
+      </section>
 
       <section id="pricing" aria-labelledby="plansHeading">
         <div class="section-head">
           <div>
-            <div class="eyebrow">Plans</div>
-            <h2 id="plansHeading">Choose your access plan</h2>
-            <p>Subscribe to unlock URL scans, detailed findings, and downloadable reports.</p>
+            <div class="eyebrow">Pricing</div>
+            <h2 id="plansHeading">Choose a plan</h2>
+            <p>Unlock URL scans, saved history and report export.</p>
           </div>
           <div>
-            <div id="subscriptionStatus" class="plan-state" role="status" aria-live="polite"></div>
+            <div class="plan-state" id="subscriptionStatus" role="status"></div>
             <button class="button" id="cancelPlanBtn" hidden>Cancel renewal</button>
           </div>
         </div>
+
         <div class="plans">
-          <article class="plan"><div class="plan-body"><h3>Monthly</h3><div class="plan-price">₹99 <small>/ month</small></div><div class="plan-cycle">Billed monthly</div></div><button class="button" data-plan="monthly">Choose monthly</button></article>
-          <article class="plan featured"><div class="plan-body"><h3>6 months <span class="badge review">Save 16%</span></h3><div class="plan-price">₹499 <small>/ 6 months</small></div><div class="plan-cycle">Billed every six months</div></div><button class="button primary" data-plan="halfyear">Choose 6 months</button></article>
-          <article class="plan"><div class="plan-body"><h3>12 months <span class="badge review">Save 16%</span></h3><div class="plan-price">₹999 <small>/ year</small></div><div class="plan-cycle">Billed yearly</div></div><button class="button" data-plan="yearly">Choose 12 months</button></article>
+          <article class="plan">
+            <div class="plan-body">
+              <h3>Monthly</h3>
+              <div class="plan-price">₹99 <small>/ month</small></div>
+              <div class="plan-cycle">Billed monthly</div>
+            </div>
+            <button class="button" data-plan="monthly">Choose monthly</button>
+          </article>
+          <article class="plan featured">
+            <div class="plan-body">
+              <h3>6 months <span class="badge review">Save 16%</span></h3>
+              <div class="plan-price">₹499 <small>/ 6 months</small></div>
+              <div class="plan-cycle">Billed every 6 months</div>
+            </div>
+            <button class="button primary" data-plan="halfyear">Choose 6 months</button>
+          </article>
+          <article class="plan">
+            <div class="plan-body">
+              <h3>12 months <span class="badge review">Save 16%</span></h3>
+              <div class="plan-price">₹999 <small>/ year</small></div>
+              <div class="plan-cycle">Billed yearly</div>
+            </div>
+            <button class="button" data-plan="yearly">Choose 12 months</button>
+          </article>
         </div>
-        <p class="plan-note">Plans renew automatically at the displayed billing interval until canceled. Payment processing is securely handled by Razorpay. Taxes, if applicable, may be added at checkout.</p>
+        <p class="plan-note">Plans renew automatically until canceled. Payments are processed by Razorpay. Taxes may apply at checkout.</p>
       </section>
     </section>
 
+    <!-- Scan history -->
     <section id="scansView" hidden>
-      <div class="heading"><div><div class="eyebrow">Workspace</div><h1>Scan history</h1><p>Previous audits saved to this workspace.</p></div><button class="button primary" type="button" data-go-view="overview">Start a scan</button></div>
-      <div class="panel" id="scanHistory" aria-live="polite"><div class="empty">Sign in and choose an active plan to view saved scans.</div></div>
+      <div class="heading">
+        <div>
+          <div class="eyebrow">Workspace</div>
+          <h1>Scan history</h1>
+          <p>Saved scans for this workspace.</p>
+        </div>
+        <button class="button primary" type="button" data-go-view="overview">New scan</button>
+      </div>
+      <div class="panel" id="scanHistory" aria-live="polite">
+        <div class="empty">Sign in with an active plan to see saved scans.</div>
+      </div>
     </section>
 
+    <!-- Issues -->
     <section id="issuesView" hidden>
-      <div class="heading"><div><div class="eyebrow">Workspace</div><h1>Issues</h1><p>Findings gathered from saved scans in this workspace.</p></div></div>
-      <div class="panel" id="issueHistory" aria-live="polite"><div class="empty">Sign in and choose an active plan to view issues.</div></div>
+      <div class="heading">
+        <div>
+          <div class="eyebrow">Workspace</div>
+          <h1>Issues</h1>
+          <p>Findings from saved scans in this workspace.</p>
+        </div>
+      </div>
+      <div class="panel" id="issueHistory" aria-live="polite">
+        <div class="empty">Sign in with an active plan to see issues.</div>
+      </div>
     </section>
 
+    <!-- Settings -->
     <section id="settingsView" hidden>
-      <div class="heading"><div><div class="eyebrow">Workspace settings</div><h1>Manage workspaces</h1><p>Group audits by client, product, or team.</p></div></div>
+      <div class="heading">
+        <div>
+          <div class="eyebrow">Settings</div>
+          <h1>Workspaces</h1>
+          <p>Group scans by client, product or team.</p>
+        </div>
+      </div>
       <div class="panel">
         <form id="workspaceForm">
-          <label for="workspaceName" class="eyebrow">Create workspace</label>
-          <div class="url-row"><input id="workspaceName" maxlength="60" placeholder="e.g. Acme website" required><button class="button primary" type="submit">Create workspace</button></div>
-          <p class="url-status" id="workspaceStatus" role="status" aria-live="polite"></p>
+          <label class="eyebrow" for="workspaceName">New workspace</label>
+          <div class="url-row">
+            <input id="workspaceName" maxlength="60" placeholder="e.g. Acme website" required>
+            <button class="button primary" type="submit">Create workspace</button>
+          </div>
+          <p class="url-status" id="workspaceStatus" role="status"></p>
         </form>
         <h2>Your workspaces</h2>
         <ul id="workspaceList"></ul>
@@ -409,131 +282,37 @@
     </section>
   </main>
 
-  <footer class="site-footer"><span>© AccessKit — Accessibility QA workspace</span><span>Heuristic results; not a conformance certification.</span></footer>
+  <footer class="site-footer">
+    <span>© AccessKit</span>
+    <span>Results are heuristic, not a conformance certification.</span>
+  </footer>
 
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <dialog class="dialog" id="authDialog" aria-labelledby="authHeading"><div class="dialog-inner"><button class="dialog-close" id="authClose" aria-label="Close sign in dialog">×</button><h2 id="authHeading">Welcome to AccessKit</h2><p id="authIntro">Sign in or create an account to choose a plan and unlock the scanner.</p><form id="authForm"><div id="nameField" hidden><label for="authName">Name</label><input id="authName" name="name" autocomplete="name"></div><label for="authEmail">Email</label><input id="authEmail" name="email" type="email" autocomplete="email" required><label for="authPassword">Password</label><input id="authPassword" name="password" type="password" autocomplete="current-password" minlength="10" required><p class="dialog-error" id="authError" role="status" aria-live="polite"></p><div class="dialog-actions"><button class="button primary" id="authSubmit" type="submit">Sign in</button></div></form><button class="dialog-switch" id="authMode" type="button">Create an account</button></div></dialog>
+  <div class="toast" id="toast" role="status"></div>
 
-<script>
-/* Checks are kept small and independent so you can add rules or replace them later. */
-const sample = `<main>
-  <h1>Update your profile</h1>
-  <form>
-    <label for="email">Email address</label>
-    <input id="email" type="email" value="alex@example.com">
-    <button type="button" style="background:#ffffff;color:#cccccc;border:1px solid #eeeeee">Save changes</button>
-    <div onclick="saveProfile()" style="background:#175f49;color:#fff;padding:10px">Save with custom control</div>
-    <input type="checkbox" id="updates"><label for="updates">Send me product updates</label>
-  </form>
-</main>`;
-const input = document.querySelector('#htmlInput');
-const list = document.querySelector('#resultList');
-let findings = [];
-let activeTab = 'violations';
-let hasScan = false;
-let scanLabel = '';
-let currentAccount = null;
-let billingConfig = null;
-const esc = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function labelOf(el){
-  const aria = el.getAttribute('aria-label');
-  if (aria && aria.trim()) return aria.trim();
-  const labelled = el.getAttribute('aria-labelledby');
-  if (labelled) return labelled.split(/\s+/).map(id => el.ownerDocument.getElementById(id)?.textContent?.trim()).filter(Boolean).join(' ');
-  if (el.id) { const label = el.ownerDocument.querySelector(`label[for="${CSS.escape(el.id)}"]`); if(label) return label.textContent.trim(); }
-  const wrapping = el.closest('label'); if(wrapping) return wrapping.textContent.trim();
-  if (el.tagName === 'BUTTON' || el.tagName === 'A') return el.textContent.trim() || el.getAttribute('title') || '';
-  return el.getAttribute('title') || '';
-}
-function hexRgb(color){
-  if(!color) return null; color=color.trim().toLowerCase();
-  if(color.startsWith('#')) { let h=color.slice(1); if(h.length===3) h=h.split('').map(x=>x+x).join(''); if(!/^[0-9a-f]{6}$/.test(h)) return null; return [0,2,4].map(i=>parseInt(h.slice(i,i+2),16)); }
-  const m=color.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/); return m ? [Number(m[1]),Number(m[2]),Number(m[3])] : null;
-}
-function luminance(rgb){const v=rgb.map(n=>n/255).map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4);return .2126*v[0]+.7152*v[1]+.0722*v[2]}
-function contrast(a,b){const x=luminance(a),y=luminance(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05)}
-function scan(markup){
-  const doc=new DOMParser().parseFromString(markup,'text/html'), found=[];
-  const add=(category,severity,title,detail,el)=>found.push({category,severity,title,detail,selector:selector(el)});
-  function selector(el){let s=el.tagName.toLowerCase();if(el.id)s+='#'+el.id;else if(el.classList.length)s+='.'+[...el.classList].slice(0,2).join('.');return s}
-  // Custom interactive elements without tabindex are likely absent from tab order.
-  doc.querySelectorAll('[onclick],[role="button"],[role="link"],[role="checkbox"],[role="tab"]').forEach(el=>{
-    if(!['BUTTON','A','INPUT','SELECT','TEXTAREA'].includes(el.tagName) && !el.hasAttribute('tabindex')) add('Keyboard','High','Custom control may not be keyboard reachable','This interactive element is not a native control and has no tabindex. Confirm it can receive focus and responds to Enter/Space as appropriate.',el);
-    if(el.getAttribute('tabindex') && Number(el.getAttribute('tabindex'))>0) add('Keyboard','Medium','Positive tabindex can disrupt focus order','Prefer the natural DOM order with tabindex="0" or native controls.',el);
-  });
-  // All non-hidden form controls should expose an accessible name.
-  doc.querySelectorAll('button,input:not([type="hidden"]),select,textarea,[role="button"],[role="checkbox"],[role="switch"],[role="tab"]').forEach(el=>{
-    if(!labelOf(el)) add('Name & role','High','Control may have no accessible name','Add a visible label, associated <label>, aria-label, or aria-labelledby. Check the computed name with a screen reader.',el);
-    if(el.matches('input[type="checkbox"],input[type="radio"]') && !el.getAttribute('role')) { /* native role is provided by HTML */ }
-    const role=el.getAttribute('role'); if(role && ['checkbox','switch','radio','slider','combobox'].includes(role) && !el.hasAttribute('aria-checked') && ['checkbox','switch','radio'].includes(role)) add('Name & role','Medium','Custom state may be missing','This custom role may need aria-checked and keyboard behavior that updates its state.',el);
-  });
-  // WCAG AA thresholds for explicit solid inline colors. Stylesheets, transparency,
-  // images and inherited/computed colors need a live browser scan.
-  doc.querySelectorAll('[style*="color"], [style*="background"], [style*="border"]').forEach(el=>{
-    const style=el.getAttribute('style')||'', fg=style.match(/(?:^|;)\s*color\s*:\s*([^;]+)/i)?.[1], bg=style.match(/(?:^|;)\s*background(?:-color)?\s*:\s*([^;]+)/i)?.[1], border=style.match(/(?:^|;)\s*border(?:-color)?\s*:\s*(?:\d+(?:px|em)?\s+\w+\s+)?(#[\da-f]{3,8}|rgba?\([^)]*\))/i)?.[1];
-    const f=hexRgb(fg),b=hexRgb(bg),br=hexRgb(border),font=style.match(/font-size\s*:\s*([\d.]+)px/i),large=font&&parseFloat(font[1])>=24;
-    if(f&&b){const ratio=contrast(f,b),threshold=large?3:4.5;if(ratio<threshold)add('Contrast','High',`Low text contrast (${ratio.toFixed(2)}:1)`,`Explicit text/background colors are below ${threshold}:1 for ${large?'large':'normal'} text (WCAG AA).`,el)}
-    const isControl=el.matches('button,a,input,select,textarea,[role],[onclick]');
-    if(isControl&&f&&b&&contrast(f,b)<3)add('Contrast','High','Control contrast below 3:1','This control foreground/background pair is below 3:1. Check its visible boundary or icon against adjacent colors.',el);
-    if(isControl&&br&&b&&contrast(br,b)<3)add('Contrast','High','Control boundary contrast below 3:1','The explicit border/background pair is below 3:1. Interface boundaries needed to identify a control should reach 3:1.',el);
-  });
-  // Keyboard usability and focus order require interaction, so always include a human test prompt.
-  if(doc.querySelector('button,a,input,select,textarea,[onclick],[tabindex]')) found.push({category:'Keyboard',severity:'Review',title:'Manually test keyboard flow','detail':'Tab through the page, confirm focus is visible and follows a logical order, and operate each control with the keyboard.',selector:'Full page'});
-  return found;
-}
-function findingBucket(f){const text=`${f.title||''} ${f.detail||''}`;if(f.severity==='Review'||/manually test|manual check/i.test(text))return'manual';if(f.severity==='Medium'||/\bmay\b|potentially|possibly/i.test(text))return'review';return'violations'}
-function findingSeverity(f){if(findingBucket(f)==='review')return'Low';const ratio=String(f.title||'').match(/(\d+(?:\.\d+)?)\s*:\s*1/);if(ratio&&Number(ratio[1])<3)return'Critical';if(/control boundary.*below 3:1|graphic contrast below 3:1/i.test(f.title||''))return'Critical';if(f.severity==='High')return'High';return'Low'}
-function updatePie(counts){const total=counts.critical+counts.high+counts.low,group=document.querySelector('#pieSlices'),empty=document.querySelector('#emptyPie'),desc=document.querySelector('#chartDescription'),summary=document.querySelector('#chartSummary');document.querySelector('#criticalCount').textContent=counts.critical;document.querySelector('#highCount').textContent=counts.high;document.querySelector('#lowCount').textContent=counts.low;if(!hasScan){group.innerHTML='';empty.style.display='';desc.textContent='No scan has been run.';summary.textContent='Run a scan to see the severity distribution.';return}if(!total){group.innerHTML='';empty.style.display='';desc.textContent='No automated findings: Critical 0, High 0, Low 0.';summary.textContent='No automated findings were detected. Manual review prompts are shown in the Manual check tab.';return}empty.style.display='none';const entries=[['Critical',counts.critical,'#a33b33'],['High',counts.high,'#a85b00'],['Low',counts.low,'#43627f']].filter(x=>x[1]>0);let angle=-90;const xy=degrees=>({x:60+50*Math.cos(degrees*Math.PI/180),y:60+50*Math.sin(degrees*Math.PI/180)});group.innerHTML=entries.map(([label,value,color])=>{const sweep=value===total?359.999:value/total*360,start=xy(angle),end=xy(angle+sweep),large=sweep>180?1:0,path=`M 60 60 L ${start.x.toFixed(3)} ${start.y.toFixed(3)} A 50 50 0 ${large} 1 ${end.x.toFixed(3)} ${end.y.toFixed(3)} Z`;angle+=sweep;return`<path d="${path}" fill="${color}"></path>`}).join('');desc.textContent=`${total} automated findings: Critical ${counts.critical}, High ${counts.high}, Low ${counts.low}.`;summary.textContent=`${total} automated ${total===1?'finding':'findings'} shown. Manual check prompts are excluded from this chart.`}
-function updateHealth(){const automated=findings.filter(f=>findingBucket(f)!=='manual'),counts={critical:0,high:0,low:0};automated.forEach(f=>{const severity=findingSeverity(f).toLowerCase();counts[severity]++});document.querySelector('#scoreContext').textContent=!hasScan?'Run a page scan to calculate a score.':`${scanLabel||'Latest scan'} · ${automated.length} automated ${automated.length===1?'finding':'findings'}`;document.querySelector('#healthScore').innerHTML=hasScan?`${Math.max(0,100-counts.critical*12-counts.high*6-counts.low*2)}<small>/100</small>`:'—<small>/100</small>';const score=hasScan?Math.max(0,100-counts.critical*12-counts.high*6-counts.low*2):null;document.querySelector('#scoreLabel').textContent=score===null?'Waiting for scan':score>=90?'Strong health':score>=75?'Good starting point':score>=50?'Needs attention':'Priority fixes needed';updatePie(counts)}
-function render(){const tabs={violations:findings.filter(f=>findingBucket(f)==='violations'),review:findings.filter(f=>findingBucket(f)==='review'),manual:findings.filter(f=>findingBucket(f)==='manual')};document.querySelector('#confirmedTabCount').textContent=tabs.violations.length;document.querySelector('#reviewTabCount').textContent=tabs.review.length;document.querySelector('#manualTabCount').textContent=tabs.manual.length;document.querySelector('#resultCount').textContent=`${tabs[activeTab].length} ${tabs[activeTab].length===1?'finding':'findings'}`;document.querySelector('#resultSummary').textContent=hasScan?`${findings.length} results from the latest check`:'Run a check to see results.';document.querySelector('#resultsPanel').setAttribute('aria-labelledby',`tab-${activeTab}`);document.querySelectorAll('.results-tabs [role="tab"]').forEach(tab=>{const selected=tab.dataset.tab===activeTab;tab.setAttribute('aria-selected',String(selected));tab.tabIndex=selected?0:-1});updateHealth();const visible=tabs[activeTab];if(!visible.length){const messages={violations:'No confirmed rule matches in this scan.',review:'No items need additional review.',manual:'No manual check prompts were generated.'};list.innerHTML=`<div class="empty"><strong>${hasScan?messages[activeTab]:'Ready when you are'}</strong>${hasScan?'Try another results tab or scan a different page.':'Run a scan to see results in this tab.'}</div>`;return}list.innerHTML=visible.map(f=>{const severity=findingSeverity(f);return`<article class="result"><div class="result-top"><div class="result-title">${esc(f.title)}</div><span class="badge ${severity.toLowerCase()}">${severity}</span></div><p><b>${esc(f.category)}</b> · ${esc(f.detail)}</p><code>${esc(f.selector)}</code></article>`}).join('')}
-function toast(message){const t=document.querySelector('#toast');t.textContent=message;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2300)}
-let workspaces=[],currentWorkspaceId=null,savedScans=[];
-async function loadWorkspaces(){if(!currentAccount){document.querySelector('#workspaceSelect').hidden=true;document.querySelector('#newWorkspaceBtn').hidden=true;return}try{const r=await fetch('/api/workspaces',{credentials:'same-origin'}),d=await r.json();if(!r.ok)throw new Error(d.error);workspaces=d.workspaces||[];const select=document.querySelector('#workspaceSelect');select.innerHTML=workspaces.map(w=>`<option value="${w.id}">${esc(w.name)}</option>`).join('');if(!workspaces.some(w=>String(w.id)===String(currentWorkspaceId)))currentWorkspaceId=workspaces[0]?.id||null;if(currentWorkspaceId)select.value=String(currentWorkspaceId);select.hidden=false;document.querySelector('#newWorkspaceBtn').hidden=false;document.querySelector('#workspaceList').innerHTML=workspaces.map(w=>`<li>${esc(w.name)}${String(w.id)===String(currentWorkspaceId)?' <b>(current)</b>':''}</li>`).join('')||'<li>No workspaces yet.</li>';document.querySelector('#workspaceCrumb').textContent=workspaces.find(w=>String(w.id)===String(currentWorkspaceId))?.name||'Overview';await loadSavedScans()}catch(e){toast(e.message||'Could not load workspaces.')}}
-async function loadSavedScans(){if(!currentAccount||!hasActivePlan()||!currentWorkspaceId){savedScans=[];renderHistory();return}try{const r=await fetch(`/api/scans?workspaceId=${encodeURIComponent(currentWorkspaceId)}`,{credentials:'same-origin'}),d=await r.json();if(!r.ok)throw new Error(d.error);savedScans=d.scans||[];renderHistory()}catch(e){document.querySelector('#scanHistory').innerHTML=`<div class="empty">${esc(e.message)}</div>`}}
-function renderHistory(){const history=document.querySelector('#scanHistory'),issues=document.querySelector('#issueHistory');if(!savedScans.length){history.innerHTML='<div class="empty"><strong>No scans saved yet</strong>Run a URL or HTML scan to start building this workspace history.</div>';issues.innerHTML='<div class="empty">No issues in this workspace yet.</div>';return}history.innerHTML=savedScans.map(s=>`<article class="history-row"><h3>${esc(s.title||s.url||'Pasted HTML markup')}</h3><p>${esc(s.scanType==='url'?'URL scan':'HTML snippet')} · ${new Date(s.createdAt).toLocaleString()} · ${(s.findings||[]).length} findings</p>${s.url?`<p>${esc(s.url)}</p>`:''}<button class="button" type="button" data-open-scan="${s.id}">Open results</button></article>`).join('');const all=savedScans.flatMap(s=>(s.findings||[]).map(f=>({...f,scanTitle:s.title||s.url||'Pasted HTML markup',scanDate:s.createdAt})));issues.innerHTML=all.length?all.map(f=>`<article class="history-row"><h3>${esc(f.title||'Accessibility issue')} <span class="badge ${findingSeverity(f).toLowerCase()}">${esc(findingSeverity(f))}</span></h3><p>${esc(f.scanTitle)} · ${esc(f.category||'')}</p><p>${esc(f.detail||'')}</p><code>${esc(f.selector||'')}</code></article>`).join(''):'<div class="empty">No findings were saved from this workspace’s scans.</div>';history.querySelectorAll('[data-open-scan]').forEach(b=>b.addEventListener('click',()=>{const s=savedScans.find(x=>String(x.id)===b.dataset.openScan);if(s){findings=s.findings||[];hasScan=true;scanLabel=s.title||s.url||'Saved scan';render();setView('overview')}}))}
-async function saveHTMLScan(items){const r=await fetch('/api/scans',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({workspaceId:currentWorkspaceId,findings:items})});const d=await r.json();if(!r.ok)throw new Error(d.error||'Could not save scan');await loadSavedScans()}
-function setView(view){const names=['overview','scans','issues','settings'];if(!names.includes(view))return;document.querySelector('#scannerHero').hidden=view!=='overview';names.forEach(name=>document.querySelector(`#${name}View`).hidden=name!==view);document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view));document.querySelector('#workspaceCrumb').textContent=view==='overview'?(workspaces.find(w=>String(w.id)===String(currentWorkspaceId))?.name||'Overview'):view[0].toUpperCase()+view.slice(1);if(view==='scans'||view==='issues')loadSavedScans()}
-document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.view)));document.querySelectorAll('[data-go-view]').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.goView)));
-document.querySelector('#scanTabUrl').addEventListener('click',()=>setScanMode('url'));document.querySelector('#scanTabHtml').addEventListener('click',()=>setScanMode('html'));
-function setScanMode(mode){const url=mode==='url';document.querySelector('#scanTabUrl').setAttribute('aria-selected',String(url));document.querySelector('#scanTabUrl').tabIndex=url?0:-1;document.querySelector('#scanTabHtml').setAttribute('aria-selected',String(!url));document.querySelector('#scanTabHtml').tabIndex=url?-1:0;document.querySelector('#scanPanelUrl').hidden=!url;document.querySelector('#scanPanelHtml').hidden=url}
-document.querySelectorAll('.scan-tabs [role="tab"]').forEach((tab,index,tabs)=>tab.addEventListener('keydown',e=>{let next=index;if(e.key==='ArrowRight')next=(index+1)%tabs.length;else if(e.key==='ArrowLeft')next=(index-1+tabs.length)%tabs.length;else if(e.key==='Home')next=0;else if(e.key==='End')next=tabs.length-1;else return;e.preventDefault();tabs[next].focus();setScanMode(next===0?'url':'html')}));
-document.querySelector('#workspaceSelect').addEventListener('change',e=>{currentWorkspaceId=e.target.value;loadWorkspaces()});document.querySelector('#newWorkspaceBtn').addEventListener('click',()=>{setView('settings');document.querySelector('#workspaceName').focus()});document.querySelector('#workspaceForm').addEventListener('submit',async e=>{e.preventDefault();if(!currentAccount){openAuth();return}const name=document.querySelector('#workspaceName').value.trim(),status=document.querySelector('#workspaceStatus');try{const r=await fetch('/api/workspaces',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({name})}),d=await r.json();if(!r.ok)throw new Error(d.error);currentWorkspaceId=d.workspace.id;document.querySelector('#workspaceName').value='';status.textContent=`Workspace “${name}” created.`;await loadWorkspaces();toast('Workspace created.')}catch(error){status.textContent=error.message}});
-document.querySelector('#scanBtn').addEventListener('click',async()=>{if(!requireFullAccess())return;if(!input.value.trim()){toast('Paste HTML or load the sample first.');input.focus();return}const button=document.querySelector('#scanBtn');button.disabled=true;try{findings=scan(input.value);hasScan=true;scanLabel='Pasted HTML markup';render();await saveHTMLScan(findings);toast('Checks complete and saved to this workspace.')}catch(e){toast(e.message)}finally{button.disabled=false}});
-document.querySelector('#urlScanForm').addEventListener('submit',async event=>{
-  event.preventDefault();
-  if(!requireFullAccess())return;
-  const field=document.querySelector('#urlInput'),status=document.querySelector('#urlStatus');let url;
-  try{url=new URL(field.value.trim());if(!['http:','https:'].includes(url.protocol))throw new Error('Use an http or https URL.')}catch(e){status.textContent=e.message||'Enter a valid public URL.';status.className='url-status error';field.focus();return}
-  const button=document.querySelector('#urlScanBtn');button.disabled=true;button.textContent='Scanning…';status.className='url-status';status.textContent=`Opening ${url.href} in Chromium…`;
-  try{const response=await fetch('/api/scan',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({url:url.href,workspaceId:currentWorkspaceId}),signal:AbortSignal.timeout(30000)});const result=await response.json();if(!response.ok)throw new Error(result.error||`Scanner returned HTTP ${response.status}.`);findings=result.findings||[];hasScan=true;scanLabel=result.title||new URL(result.finalURL).host;render();await loadSavedScans();status.textContent=`Rendered scan complete${result.title?` for “${result.title}”`:''}. Computed styles and loaded page content were checked at ${new URL(result.finalURL).host}.`;status.className='url-status success';toast('Rendered page scanned and saved. Review each finding in context.')
-  }catch(e){const unavailable=/failed to fetch|networkerror|load failed/i.test(e.message);status.textContent=unavailable?'The scan service is not connected. This prototype needs its backend running. For local development, use the setup steps in README.md; for a public SaaS, deploy the backend with a managed browser endpoint configured as BROWSERLESS_WS_ENDPOINT. Visitors should not need to install Playwright or Chromium.':`Scan failed: ${e.message}`;status.className='url-status error';toast('Could not complete the rendered scan.')}
-  finally{button.disabled=false;button.innerHTML='Scan page <span aria-hidden="true">→</span>'}
-});
-document.querySelector('#sampleBtn').addEventListener('click',()=>{input.value=sample;toast('Sample loaded. Run the checks to see example results.')});
-document.querySelector('#fileInput').addEventListener('change',async e=>{const file=e.target.files[0];if(file){input.value=await file.text();toast(`${file.name} loaded.`)}});
-document.querySelectorAll('.results-tabs [role="tab"]').forEach((tab,index,tabs)=>{tab.addEventListener('click',()=>{activeTab=tab.dataset.tab;render()});tab.addEventListener('keydown',event=>{let next=index;if(event.key==='ArrowRight')next=(index+1)%tabs.length;else if(event.key==='ArrowLeft')next=(index-1+tabs.length)%tabs.length;else if(event.key==='Home')next=0;else if(event.key==='End')next=tabs.length-1;else return;event.preventDefault();tabs[next].focus();activeTab=tabs[next].dataset.tab;render()})});
-document.querySelector('#exportBtn').addEventListener('click',()=>{if(!requireFullAccess())return;if(!findings.length){toast('Run a check before exporting.');return}const payload={product:'AccessKit starter',createdAt:new Date().toISOString(),notice:'Heuristic results; not a conformance certification.',findings};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='accessibility-report.json';a.click();URL.revokeObjectURL(url);toast('Report downloaded.')});
+  <dialog class="dialog" id="authDialog" aria-labelledby="authHeading">
+    <div class="dialog-inner">
+      <button class="dialog-close" id="authClose" type="button" aria-label="Close">×</button>
+      <h2 id="authHeading">Sign in to AccessKit</h2>
+      <p id="authIntro">Access your scans, workspaces and plan.</p>
+      <form id="authForm">
+        <div id="nameField" hidden>
+          <label for="authName">Name</label>
+          <input id="authName" name="name" autocomplete="name">
+        </div>
+        <label for="authEmail">Email</label>
+        <input id="authEmail" name="email" type="email" autocomplete="email" required>
+        <label for="authPassword">Password</label>
+        <input id="authPassword" name="password" type="password" autocomplete="current-password" minlength="10" required aria-describedby="passwordHint">
+        <p class="field-hint" id="passwordHint" hidden>At least 10 characters.</p>
+        <p class="dialog-error" id="authError" role="status"></p>
+        <div class="dialog-actions">
+          <button class="button primary" id="authSubmit" type="submit">Sign in</button>
+        </div>
+      </form>
+      <button class="dialog-switch" id="authMode" type="button">New here? Create an account</button>
+    </div>
+  </dialog>
 
-const authDialog=document.querySelector('#authDialog');
-let authMode='login';
-function setAuthMode(mode){authMode=mode;document.querySelector('#nameField').hidden=mode!=='register';document.querySelector('#authName').required=mode==='register';document.querySelector('#authHeading').textContent=mode==='register'?'Create your account':'Welcome to AccessKit';document.querySelector('#authIntro').textContent=mode==='register'?'Create an account to choose a plan and save access to your scan workspace.':'Sign in to choose a plan and unlock the scanner.';document.querySelector('#authSubmit').textContent=mode==='register'?'Create account':'Sign in';document.querySelector('#authMode').textContent=mode==='register'?'Already have an account? Sign in':'Create an account';document.querySelector('#authPassword').autocomplete=mode==='register'?'new-password':'current-password';document.querySelector('#authError').textContent=''}
-function openAuth(){setAuthMode('login');authDialog.showModal();document.querySelector('#authEmail').focus()}
-function hasActivePlan(){return Boolean(currentAccount?.subscription?.active)}
-function requireFullAccess(){if(!currentAccount){openAuth();return false}if(!hasActivePlan()){document.querySelector('#plansHeading').scrollIntoView({behavior:'smooth',block:'center'});toast('Choose an active plan to unlock this feature.');return false}if(!currentWorkspaceId){toast('Your workspace is loading. Try again in a moment.');loadWorkspaces();return false}return true}
-function updateAccount(user){currentAccount=user;const button=document.querySelector('#accountButton'),logout=document.querySelector('#logoutButton'),status=document.querySelector('#subscriptionStatus'),cancel=document.querySelector('#cancelPlanBtn');if(user){button.textContent=user.name;button.title=user.email;logout.hidden=false;status.textContent=user.subscription?.active?`${user.subscription.plan} plan active${user.subscription.renewsAt?` · renews ${new Date(user.subscription.renewsAt).toLocaleDateString()}`:''}${user.subscription.cancelScheduled?' · cancellation scheduled':''}`:'Signed in · choose a plan to unlock scans';cancel.hidden=!(user.subscription?.active&&!user.subscription.cancelScheduled);document.querySelectorAll('[data-plan]').forEach(b=>b.textContent=user.subscription?.active?'Current plan':`Choose ${b.dataset.plan==='halfyear'?'6 months':b.dataset.plan==='yearly'?'12 months':'monthly'}`);loadWorkspaces()}else{button.textContent='Sign in';button.title='Sign in or create an account';logout.hidden=true;cancel.hidden=true;status.textContent='Sign in to subscribe and access the full scanner';document.querySelectorAll('[data-plan]').forEach(b=>b.disabled=false);document.querySelector('#workspaceSelect').hidden=true;document.querySelector('#newWorkspaceBtn').hidden=true;workspaces=[];savedScans=[]}}
-async function fetchAccount(){const response=await fetch('/api/me',{credentials:'same-origin'});if(response.ok){const data=await response.json();updateAccount(data.user)}else updateAccount(null)}
-document.querySelector('#accountButton').addEventListener('click',()=>{if(!currentAccount){openAuth();return}const message=currentAccount.subscription?.active?`${currentAccount.name} · ${currentAccount.email} · ${currentAccount.subscription.plan} plan`:`${currentAccount.name} · ${currentAccount.email} · No active plan`;toast(message)});
-document.querySelector('#authClose').addEventListener('click',()=>authDialog.close());
-document.querySelector('#authMode').addEventListener('click',()=>setAuthMode(authMode==='login'?'register':'login'));
-document.querySelector('#authForm').addEventListener('submit',async event=>{event.preventDefault();const form=new FormData(event.currentTarget),error=document.querySelector('#authError'),submit=document.querySelector('#authSubmit');submit.disabled=true;error.textContent='';try{const response=await fetch(`/api/auth/${authMode}`,{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({name:form.get('name'),email:form.get('email'),password:form.get('password')})});const data=await response.json();if(!response.ok)throw new Error(data.error||'Could not sign in.');updateAccount(data.user);authDialog.close();toast(authMode==='register'?'Account created. Choose a plan to continue.':'Signed in. Choose a plan to continue.')}catch(e){error.textContent=e.message}finally{submit.disabled=false}});
-document.querySelector('#logoutButton').addEventListener('click',async()=>{await fetch('/api/auth/logout',{method:'POST',credentials:'same-origin'}).catch(()=>{});updateAccount(null);toast('You have signed out.')});
-async function loadScript(src){return new Promise((resolve,reject)=>{if(window.Razorpay)return resolve();const script=document.createElement('script');script.src=src;script.onload=resolve;script.onerror=()=>reject(new Error('Could not load the secure checkout.'));document.head.append(script)})}
-async function waitForPlanActivation(){for(let i=0;i<8;i++){await new Promise(resolve=>setTimeout(resolve,2500));await fetchAccount();if(hasActivePlan())return true}return false}
-document.querySelectorAll('[data-plan]').forEach(button=>button.addEventListener('click',async()=>{if(!currentAccount){openAuth();return}if(hasActivePlan()){toast('You already have an active plan.');return}const status=document.querySelector('#subscriptionStatus');button.disabled=true;status.textContent='Preparing secure checkout…';try{const response=await fetch('/api/billing/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({planKey:button.dataset.plan})});const data=await response.json();if(!response.ok)throw new Error(data.error||'Could not start checkout.');await loadScript('https://checkout.razorpay.com/v1/checkout.js');const checkout=new window.Razorpay({key:data.keyId,subscription_id:data.subscriptionId,name:'AccessKit',description:`${data.planName} accessibility scanner plan`,prefill:{name:currentAccount.name,email:currentAccount.email},theme:{color:'#126b50'},handler:async payment=>{status.textContent='Verifying payment…';try{const verified=await fetch('/api/billing/verify',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify(payment)});const result=await verified.json();if(!verified.ok)throw new Error(result.error||'Payment verification failed.');status.textContent=result.message;const active=await waitForPlanActivation();if(active)toast('Your scanner plan is active.');else status.textContent=`${result.message} Refresh this page shortly to check activation.`}catch(error){status.textContent=error.message}}});checkout.on('payment.failed',()=>{status.textContent='Payment did not complete. You can try again.'});checkout.open()}catch(error){status.textContent=error.message}finally{button.disabled=false}}));
-document.querySelector('#cancelPlanBtn').addEventListener('click',async()=>{const button=document.querySelector('#cancelPlanBtn'),status=document.querySelector('#subscriptionStatus');if(!currentAccount||!hasActivePlan())return;button.disabled=true;try{const response=await fetch('/api/billing/cancel',{method:'POST',credentials:'same-origin'});const data=await response.json();if(!response.ok)throw new Error(data.error||'Could not schedule cancellation.');updateAccount({...currentAccount,subscription:data.subscription});status.textContent=data.message}catch(error){status.textContent=error.message}finally{button.disabled=false}});
-fetch('/api/config').then(r=>r.json()).then(config=>{billingConfig=config;const missing=(config.plans||[]).filter(plan=>!plan.configured);if(!config.razorpayKeyId||missing.length){document.querySelector('.plan-note').textContent='Checkout setup is pending. Add Razorpay test/live API keys and create the three matching subscription plans in the server environment before accepting payments.'}}).catch(()=>{});
-fetchAccount().catch(()=>updateAccount(null));
-</script>
+  <script src="app.js"></script>
 </body>
 </html>
-
